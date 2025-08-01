@@ -6,7 +6,7 @@ name: SM8150 Xiaomi Pad 5
 on:
 #  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "dbkp" ]
+    branches: [ "dbkp-vol" ]
     paths:
       - "Platforms/SurfaceDuo1Pkg/Device/xiaomi-nabu/**"
       - "Platforms/AndromedaPkg/Include/Resources/**"
