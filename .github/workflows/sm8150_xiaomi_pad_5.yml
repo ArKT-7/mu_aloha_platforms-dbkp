@@ -1,14 +1,15 @@
 # This is a basic workflow to help you get started with Actions
 
-name: SM8150 Xiaomi Pad5
+name: SM8150 Xiaomi Pad 5
 
 # Controls when the workflow will run
 on:
 #  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: [ "dbkp-refind" ]
     paths:
-      - 'Platforms/SurfaceDuo1Pkg/Device/xiaomi-nabu/**'
+      - "Platforms/SurfaceDuo1Pkg/Device/xiaomi-nabu/**"
+      - "Platforms/AndromedaPkg/Include/Resources/**"
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -33,6 +34,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: uefi-images-nabu
-          path: Build/*/ci_artifacts
+          name: fd-efi-refind-nabu
+          path: Build/*/ci_artifacts/xiaomi-nabu/*.fd
           compression-level: 9
