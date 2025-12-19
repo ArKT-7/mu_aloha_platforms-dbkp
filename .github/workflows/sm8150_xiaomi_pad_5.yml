@@ -31,9 +31,34 @@ jobs:
       - name: Build SB/NOSB uefi for xiaomi pad 5.
         run: bash scripts/ci_setup.sh && ./build_uefi.py -d xiaomi-nabu
 
+      - name: Prepare Artifact Name
+        id: prep_name
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_TITLE=$(gh run view ${{ github.run_id }} --json displayTitle --template '{{.displayTitle}}')
+          CLEAN_TITLE=$(echo "$RUN_TITLE" | sed 's/[lL][oO][gG][oO]//g' | sed 's/[^a-zA-Z0-9 ]//g' | sed 's/ /_/g' | sed 's/__*/_/g' | sed 's/_$//')
+          if [ -z "$CLEAN_TITLE" ]; then CLEAN_TITLE="build"; fi
+          echo "CLEAN_TITLE=$CLEAN_TITLE" >> $GITHUB_OUTPUT
+          echo "FINAL_NAME=${CLEAN_TITLE}-uefi-nabu" >> $GITHUB_OUTPUT
+
+      - name: Prepare staging folder
+        run: |
+          TITLE="${{ steps.prep_name.outputs.CLEAN_TITLE }}"
+          DIR_NAME="${{ steps.prep_name.outputs.FINAL_NAME }}"
+          TARGET_DIR="staging/$DIR_NAME"
+          mkdir -p "$TARGET_DIR"
+          cp Build/*/ci_artifacts/xiaomi-nabu/*.fd "$TARGET_DIR/"
+
+          for f in "$TARGET_DIR"/*.fd; do
+            [ -e "$f" ] || continue
+            new_name=$(basename "$f" | sed "s/SM8150/${TITLE}/")
+            mv "$f" "$TARGET_DIR/$new_name"
+          done
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fd-efi-refind-nabu
-          path: Build/*/ci_artifacts/xiaomi-nabu/*.fd
+          name: ${{ steps.prep_name.outputs.FINAL_NAME }}
+          path: staging/
           compression-level: 9
